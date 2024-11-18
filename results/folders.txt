@@ -1,0 +1,10 @@
+Baselines: 
+    webvoyager_encode_image timing: 
+        - results/20241118_12_23_49/taskCambridge Dictionary--29
+
+    simplex_encode_image timing: 
+        - results/20241118_12_29_40/taskCambridge Dictionary--29
+
+    simplex_encode_image (no denoising): 
+        - results/20241118_12_41_51/taskCambridge Dictionary--29
+

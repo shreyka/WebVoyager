@@ -118,6 +118,7 @@ def call_gpt4v_api(args, openai_client, messages):
     retry_times = 0
     while True:
         try:
+            start_time = time.time()
             if not args.text_only:
                 logging.info('Calling gpt4v API...')
                 openai_response = openai_client.chat.completions.create(
@@ -128,16 +129,23 @@ def call_gpt4v_api(args, openai_client, messages):
                 openai_response = openai_client.chat.completions.create(
                     model=args.api_model, messages=messages, max_tokens=1000, seed=args.seed, timeout=30
                 )
+            end_time = time.time()
+            api_duration = end_time - start_time
+            logging.info(f'API call duration: {api_duration:.2f} seconds')
 
             prompt_tokens = openai_response.usage.prompt_tokens
             completion_tokens = openai_response.usage.completion_tokens
 
             logging.info(f'Prompt Tokens: {prompt_tokens}; Completion Tokens: {completion_tokens}')
+            logging.info('API call complete...')
 
             gpt_call_error = False
             return prompt_tokens, completion_tokens, gpt_call_error, openai_response
 
         except Exception as e:
+            end_time = time.time()
+            api_duration = end_time - start_time
+            logging.info(f'API call failed after {api_duration:.2f} seconds')
             logging.info(f'Error occurred, retrying. Error type: {type(e).__name__}')
 
             if type(e).__name__ == 'RateLimitError':
@@ -236,7 +244,7 @@ def main():
     parser.add_argument('--test_file', type=str, default='data/test.json')
     parser.add_argument('--max_iter', type=int, default=5)
     parser.add_argument("--api_key", default="key", type=str, help="YOUR_OPENAI_API_KEY")
-    parser.add_argument("--api_model", default="gpt-4-vision-preview", type=str, help="api model name")
+    parser.add_argument("--api_model", default="gpt-4o", type=str, help="api model name")
     parser.add_argument("--output_dir", type=str, default='results')
     parser.add_argument("--seed", type=int, default=None)
     parser.add_argument("--max_attached_imgs", type=int, default=1)
@@ -275,7 +283,7 @@ def main():
         task_dir = os.path.join(result_dir, 'task{}'.format(task["id"]))
         os.makedirs(task_dir, exist_ok=True)
         setup_logger(task_dir)
-        logging.info(f'########## TASK{task["id"]} ##########')
+        logging.info(f'########## TASK: {task["id"]} ##########')
 
         driver_task = webdriver.Chrome(options=options)
 
@@ -346,7 +354,9 @@ def main():
                     get_webarena_accessibility_tree(driver_task, accessibility_tree_path)
 
                 # encode image
+                start = time.time()
                 b64_img = encode_image(img_path)
+                logging.info(f"Time taken to encode image: {time.time() - start} seconds")
 
                 # format msg
                 if not args.text_only:
@@ -369,6 +379,7 @@ def main():
 
             # Call GPT-4v API
             prompt_tokens, completion_tokens, gpt_call_error, openai_response = call_gpt4v_api(args, client, messages)
+            logging.info(f"Total processing time: {time.time() - start} seconds")
 
             if gpt_call_error:
                 break
@@ -500,5 +511,6 @@ def main():
 
 
 if __name__ == '__main__':
+    print('starting...')
     main()
     print('End of process')

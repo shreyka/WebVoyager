@@ -5,6 +5,8 @@ import json
 import time
 import logging
 import numpy as np
+import cv2
+
 from PIL import Image
 from utils_webarena import fetch_browser_info, fetch_page_accessibility_tree,\
                     parse_accessibility_tree, clean_accesibility_tree
@@ -31,8 +33,32 @@ def resize_image(image_path):
 # base64 encoding
 # Code from OpenAI Document
 def encode_image(image_path):
+    return simplex_encode_image(image_path)
+    
+def webvoyager_encode_image(image_path):
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
+
+def simplex_encode_image(image_path):
+    frame = cv2.imread(image_path)
+
+    # Resize operation but maintain aspect ratio
+    height, width = frame.shape[:2]
+    max_dimension = 650
+    scale = max_dimension / max(height, width)
+    new_width = int(width * scale)
+    new_height = int(height * scale)
+    frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_AREA)
+
+    # denoising with small windows
+    # frame = cv2.fastNlMeansDenoisingColored(frame, None, 10, 10, 7, 21)
+
+    # compression
+    encode_params = [cv2.IMWRITE_JPEG_QUALITY, 50]
+    _, buffer = cv2.imencode(".jpg", frame, encode_params)
+
+    return base64.b64encode(buffer).decode("utf-8")
+
 
 
 # interact with webpage and add rectangles on elements
@@ -258,6 +284,7 @@ def clip_message(msg, max_img_num):
 def clip_message_and_obs(msg, max_img_num):
     clipped_msg = []
     img_num = 0
+    total_images = 0
     for idx in range(len(msg)):
         curr_msg = msg[len(msg) - 1 - idx]
         if curr_msg['role'] != 'user':
@@ -267,8 +294,10 @@ def clip_message_and_obs(msg, max_img_num):
                 clipped_msg = [curr_msg] + clipped_msg
             elif img_num < max_img_num:
                 img_num += 1
+                total_images += 1
                 clipped_msg = [curr_msg] + clipped_msg
             else:
+                total_images += 1
                 msg_no_pdf = curr_msg['content'][0]["text"].split("Observation:")[0].strip() + "Observation: A screenshot and some texts. (Omitted in context.)"
                 msg_pdf = curr_msg['content'][0]["text"].split("Observation:")[0].strip() + "Observation: A screenshot, a PDF file and some texts. (Omitted in context.)"
                 curr_msg_clip = {
@@ -276,6 +305,7 @@ def clip_message_and_obs(msg, max_img_num):
                     'content': msg_no_pdf if "You downloaded a PDF file" not in curr_msg['content'][0]["text"] else msg_pdf
                 }
                 clipped_msg = [curr_msg_clip] + clipped_msg
+    print("IMAGE NUM: ", total_images)
     return clipped_msg
 
 
