@@ -58,6 +58,7 @@ def simplex_encode_image(image_path):
 
 
 
+
 # interact with webpage and add rectangles on elements
 def get_web_element_rect(browser, fix_color=True):
     if fix_color:

@@ -313,6 +313,8 @@ def main(args):
                 try:
                     if not args.text_only:
                         rects, web_eles, web_eles_text = get_web_element_rect(driver_task, fix_color=args.fix_box_color)
+                        logging.info(f"Num of interactive elements: {len(rects)}")
+                        logging.info(f"Web elements text: {web_eles_text}")
                     else:
                         accessibility_tree_path = os.path.join(task_dir, 'accessibility_tree{}'.format(it))
                         ac_tree, obs_info = get_webarena_accessibility_tree(driver_task, accessibility_tree_path)
@@ -493,7 +495,7 @@ def main(args):
 if __name__ == '__main__':
     print('starting...')
     parser = argparse.ArgumentParser()
-    parser.add_argument('--test_file', type=str, default='data/test.json')
+    parser.add_argument('--test_file', type=str, default='data/tasks_test.jsonl')
     parser.add_argument('--max_iter', type=int, default=5)
     parser.add_argument("--api_key", default="key", type=str, help="YOUR_OPENAI_API_KEY")
     parser.add_argument("--api_model", default="gpt-4o", type=str, help="api model name")
