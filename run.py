@@ -7,6 +7,7 @@ import os
 import shutil
 import logging
 
+from OmniParser.utils import get_element_rect_from_image
 from selenium import webdriver
 from selenium.webdriver.common.by import By
 from selenium.webdriver.common.keys import Keys
@@ -113,7 +114,6 @@ def format_msg_text_only(it, init_msg, pdf_obs, warn_obs, ac_tree):
             }
         return curr_msg
 
-
 def call_gpt4v_api(args, openai_client, messages):
     retry_times = 0
     while True:
@@ -171,6 +171,31 @@ def call_gpt4v_api(args, openai_client, messages):
 def exec_action_click(info, web_ele, driver_task):
     driver_task.execute_script("arguments[0].setAttribute('target', '_self')", web_ele)
     web_ele.click()
+    time.sleep(3)
+
+
+def exec_action_click_by_coordinates(info, web_ele, driver_task):
+    # Add support for clicking by coordinates
+    if isinstance(web_ele, dict) and 'bounds' in web_ele:  # New coordinate-based click
+        bounds = web_ele['bounds']
+        center_x = bounds[0] + bounds[2] // 2
+        center_y = bounds[1] + bounds[3] // 2
+        element = driver_task.execute_script(
+            "return document.elementFromPoint(arguments[0], arguments[1]);", 
+            center_x, center_y
+        )
+        if element:
+            driver_task.execute_script("arguments[0].setAttribute('target', '_self')", element)
+            element.click()
+        else:
+            # Fallback to JavaScript click at coordinates if no element found
+            driver_task.execute_script(
+                'document.elementFromPoint(arguments[0], arguments[1]).click();',
+                center_x, center_y
+            )
+    else:  # Original element-based click
+        driver_task.execute_script("arguments[0].setAttribute('target', '_self')", web_ele)
+        web_ele.click()
     time.sleep(3)
 
 
@@ -312,7 +337,9 @@ def main(args):
             if not fail_obs:
                 try:
                     if not args.text_only:
-                        rects, web_eles, web_eles_text = get_web_element_rect(driver_task, fix_color=args.fix_box_color)
+                        img_path = os.path.join(task_dir, 'screenshot_raw{}.png'.format(it))
+                        driver_task.save_screenshot(img_path)
+                        rects, web_eles, web_eles_text = get_element_rect_from_image(driver_task, img_path, fix_color=args.fix_box_color)#get_web_element_rect(driver_task, fix_color=args.fix_box_color)
                         logging.info(f"Num of interactive elements: {len(rects)}")
                         logging.info(f"Web elements text: {web_eles_text}")
                     else:
@@ -381,7 +408,6 @@ def main(args):
                     driver_task.execute_script("arguments[0].remove()", rect_ele)
                 rects = []
                 # driver_task.save_screenshot(os.path.join(task_dir, 'screenshot{}_no_box.png'.format(it)))
-
 
             # extract action info
             try:
