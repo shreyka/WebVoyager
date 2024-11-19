@@ -4,6 +4,6 @@ results/2024*
 test_code.py
 .env
 __pycache__
-OmniParser/
+OmniParser/weights
 omniparser_captions_test/
 test_results/
