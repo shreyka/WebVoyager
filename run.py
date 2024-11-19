@@ -239,27 +239,7 @@ def exec_action_scroll(info, web_eles, driver_task, args, obs_info):
     time.sleep(3)
 
 
-def main():
-    parser = argparse.ArgumentParser()
-    parser.add_argument('--test_file', type=str, default='data/test.json')
-    parser.add_argument('--max_iter', type=int, default=5)
-    parser.add_argument("--api_key", default="key", type=str, help="YOUR_OPENAI_API_KEY")
-    parser.add_argument("--api_model", default="gpt-4o", type=str, help="api model name")
-    parser.add_argument("--output_dir", type=str, default='results')
-    parser.add_argument("--seed", type=int, default=None)
-    parser.add_argument("--max_attached_imgs", type=int, default=1)
-    parser.add_argument("--temperature", type=float, default=1.0)
-    parser.add_argument("--download_dir", type=str, default="downloads")
-    parser.add_argument("--text_only", action='store_true')
-    # for web browser
-    parser.add_argument("--headless", action='store_true', help='The window of selenium')
-    parser.add_argument("--save_accessibility_tree", action='store_true')
-    parser.add_argument("--force_device_scale", action='store_true')
-    parser.add_argument("--window_width", type=int, default=1024)
-    parser.add_argument("--window_height", type=int, default=768)  # for headless mode, there is no address bar
-    parser.add_argument("--fix_box_color", action='store_true')
-
-    args = parser.parse_args()
+def main(args):
 
     # OpenAI client
     client = OpenAI(api_key=args.api_key)
@@ -512,5 +492,29 @@ def main():
 
 if __name__ == '__main__':
     print('starting...')
-    main()
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--test_file', type=str, default='data/test.json')
+    parser.add_argument('--max_iter', type=int, default=5)
+    parser.add_argument("--api_key", default="key", type=str, help="YOUR_OPENAI_API_KEY")
+    parser.add_argument("--api_model", default="gpt-4o", type=str, help="api model name")
+    parser.add_argument("--output_dir", type=str, default='results')
+    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--max_attached_imgs", type=int, default=1)
+    parser.add_argument("--temperature", type=float, default=1.0)
+    parser.add_argument("--download_dir", type=str, default="downloads")
+    parser.add_argument("--text_only", action='store_true')
+    # for web browser
+    parser.add_argument("--headless", action='store_true', help='The window of selenium')
+    parser.add_argument("--save_accessibility_tree", action='store_true')
+    parser.add_argument("--force_device_scale", action='store_true')
+    parser.add_argument("--window_width", type=int, default=1024)
+    parser.add_argument("--window_height", type=int, default=768)  # for headless mode, there is no address bar
+    parser.add_argument("--fix_box_color", action='store_true')
+    parser.add_argument("--run_multiple", type=int, default=1)
+
+    args = parser.parse_args()
+
+    for _ in range(args.run_multiple):
+        main(args)
+
     print('End of process')
