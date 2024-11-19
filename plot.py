@@ -53,13 +53,13 @@ def plot_timing(folder, task_name = "taskCambridge Dictionary--29"):
     plt.close()
 
 
-def compare_total_timing(folders):
+def compare_total_timing(folders, task_name="taskCambridge Dictionary--29"):
     # Create the plot
     plt.figure(figsize=(10, 6))
     
     # Plot total times for each folder
     for folder in folders:
-        lines = read_log(folder, "taskCambridge Dictionary--29")
+        lines = read_log(folder, task_name)
         total_times, _, _ = get_times(lines)
         
         # Create x-axis values (iteration numbers)
@@ -87,4 +87,4 @@ if __name__ == '__main__':
     # args = parser.parse_args()
 
     # plot_timing(args.folder)
-    compare_total_timing(["results/20241118_12_23_49", "results/20241118_12_29_40", "results/20241118_12_41_51"])
+    compare_total_timing(['results/20241118_16_20_59', 'results/20241118_16_32_54', 'results/20241118_16_16_01', 'results/20241118_16_26_19', 'results/20241118_15_37_34', 'results/20241118_15_56_04', 'results/20241118_16_37_33', 'results/20241118_16_38_17', 'results/20241118_16_31_25', 'results/20241118_16_35_15'], "taskArXiv--7")

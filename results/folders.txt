@@ -1,10 +1,15 @@
 Baselines: 
     webvoyager_encode_image timing: 
-        - results/20241118_12_23_49/taskCambridge Dictionary--29
+        - results/20241118_15_56_04/taskArXiv--7
+        - results/20241118_16_32_54/taskArXiv--7
+        - results/20241118_16_35_15/taskArXiv--7
+        - results/20241118_16_37_33/taskArXiv--7
+        - results/20241118_16_38_17/taskArXiv--7
 
     simplex_encode_image timing: 
-        - results/20241118_12_29_40/taskCambridge Dictionary--29
-
-    simplex_encode_image (no denoising): 
-        - results/20241118_12_41_51/taskCambridge Dictionary--29
+        - results/20241118_15_37_34/taskArXiv--7
+        - results/20241118_16_16_01/taskArXiv--7
+        - results/20241118_16_20_59/taskArXiv--7
+        - results/20241118_16_26_19/taskArXiv--7
+        - results/20241118_16_31_25/taskArXiv--7
 

@@ -284,6 +284,7 @@ def parse_accessibility_tree(
     accessibility_tree: AccessibilityTree,
 ) -> tuple[str, dict[str, Any]]:
     """Parse the accessibility tree into a string text"""
+    print("ACCESSIBILITY_TREE: ", accessibility_tree)
     node_id_to_idx = {}
     for idx, node in enumerate(accessibility_tree):
         node_id_to_idx[node["nodeId"]] = idx
@@ -364,6 +365,7 @@ def parse_accessibility_tree(
         return tree_str
 
     tree_str = dfs(0, accessibility_tree[0]["nodeId"], 0)
+    print("TREE_STR: ", tree_str)
     return tree_str, obs_nodes_info
 
 

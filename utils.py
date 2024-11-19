@@ -33,7 +33,7 @@ def resize_image(image_path):
 # base64 encoding
 # Code from OpenAI Document
 def encode_image(image_path):
-    return simplex_encode_image(image_path)
+    return webvoyager_encode_image(image_path)
     
 def webvoyager_encode_image(image_path):
     with open(image_path, "rb") as image_file:
@@ -49,9 +49,6 @@ def simplex_encode_image(image_path):
     new_width = int(width * scale)
     new_height = int(height * scale)
     frame = cv2.resize(frame, (new_width, new_height), interpolation=cv2.INTER_AREA)
-
-    # denoising with small windows
-    # frame = cv2.fastNlMeansDenoisingColored(frame, None, 10, 10, 7, 21)
 
     # compression
     encode_params = [cv2.IMWRITE_JPEG_QUALITY, 50]
