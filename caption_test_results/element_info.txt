@@ -1,0 +1,132 @@
+Element 0 (Text):
+  Content: Cornell University
+  Bounding Box (xyxy): (74, 27, 219, 48)
+
+Element 1 (Text):
+  Content: We gratefully acknowledge support from the Simons Foundation,.
+  Bounding Box (xyxy): (512, 23, 861, 38)
+
+Element 2 (Text):
+  Content: Donate
+  Bounding Box (xyxy): (886, 28, 940, 46)
+
+Element 3 (Text):
+  Content: member institutions, and all contributors.
+  Bounding Box (xyxy): (640, 39, 861, 52)
+
+Element 4 (Text):
+  Content: Login
+  Bounding Box (xyxy): (909, 81, 947, 102)
+
+Element 5 (Text):
+  Content: arXiV
+  Bounding Box (xyxy): (6, 100, 148, 147)
+
+Element 6 (Text):
+  Content: Search...
+  Bounding Box (xyxy): (615, 111, 665, 126)
+
+Element 7 (Text):
+  Content: All fields
+  Bounding Box (xyxy): (780, 111, 832, 127)
+
+Element 8 (Text):
+  Content: Search
+  Bounding Box (xyxy): (900, 113, 943, 128)
+
+Element 9 (Text):
+  Content: Help | Advanced Search
+  Bounding Box (xyxy): (647, 134, 776, 148)
+
+Element 10 (Text):
+  Content: arXiv is a free distribution service and an open-access archive for nearly 2.4 million scholarly articles in the fields of physics, mathematics,.
+  Bounding Box (xyxy): (21, 195, 899, 212)
+
+Element 11 (Text):
+  Content: computer science, quantitative biology, quantitative finance, statistics, electrical engineering and systems science, and economics. Materials on
+  Bounding Box (xyxy): (21, 213, 934, 228)
+
+Element 12 (Text):
+  Content: this site are not peer-reviewed by arXiv..
+  Bounding Box (xyxy): (20, 228, 275, 245)
+
+Element 13 (Text):
+  Content: Subject search and browse:
+  Bounding Box (xyxy): (31, 271, 222, 285)
+
+Element 14 (Text):
+  Content: Physics
+  Bounding Box (xyxy): (31, 286, 84, 307)
+
+Element 15 (Text):
+  Content: Search
+  Bounding Box (xyxy): (324, 289, 370, 305)
+
+Element 16 (Text):
+  Content: Form Interface
+  Bounding Box (xyxy): (387, 288, 477, 306)
+
+Element 17 (Text):
+  Content: Catchup
+  Bounding Box (xyxy): (493, 288, 548, 306)
+
+Element 18 (Text):
+  Content: Physics
+  Bounding Box (xyxy): (10, 347, 93, 369)
+
+Element 19 (Text):
+  Content: Astrophysics (astro-ph new, recent, search) Astrophysics of Galaxies; Cosmology and Nongalactic Astrophysics; Earth and Planetary.
+  Bounding Box (xyxy): (47, 389, 901, 406)
+
+Element 20 (Text):
+  Content: Astrophysics; High Energy Astrophysical Phenomena; Instrumentation and Methods for Astrophysics; Solar and Stellar Astrophysics.
+  Bounding Box (xyxy): (49, 405, 891, 422)
+
+Element 21 (Text):
+  Content: Condensed Matter (cond-mat new, recent, search) Disordered Systems and Neural Networks; Materials Science; Mesoscale and Nanoscale
+  Bounding Box (xyxy): (48, 422, 946, 437)
+
+Element 22 (Text):
+  Content: Physics; Other Condensed Matter; Quantum Gases; Soft Condensed Matter; Statistical Mechanics; Strongly Correlated Electrons;.
+  Bounding Box (xyxy): (48, 436, 880, 456)
+
+Element 23 (Text):
+  Content: Superconductivity
+  Bounding Box (xyxy): (50, 455, 165, 469)
+
+Element 24 (Text):
+  Content: General Relativity and Quantum Cosmology (gr-qc new, recent, search)
+  Bounding Box (xyxy): (36, 467, 511, 489)
+
+Element 25 (Text):
+  Content: High Energy Physics - Experiment (hep-ex new, recent, search).
+  Bounding Box (xyxy): (36, 485, 459, 503)
+
+Element 26 (Text):
+  Content: High Energy Physics - Lattice (hep-lat new, recent, search).
+  Bounding Box (xyxy): (35, 503, 429, 517)
+
+Element 27 (Text):
+  Content: High Energy Physics - Phenomenology (hep-ph new, recent, search).
+  Bounding Box (xyxy): (35, 519, 490, 533)
+
+Element 28 (Text):
+  Content: High Energy Physics - Theory (hep-th new, recent, search).
+  Bounding Box (xyxy): (41, 533, 428, 550)
+
+Element 29 (Text):
+  Content: Mathematical Physics (math-ph new, recent, search).
+  Bounding Box (xyxy): (46, 549, 391, 567)
+
+Element 30 (Text):
+  Content: Nonlinear Sciences (nlin new, recent, search).
+  Bounding Box (xyxy): (45, 564, 344, 582)
+
+Element 31 (UI):
+  Caption: Expand to show more options
+  Coordinates (xywh): [0.07551020408163266, 0.04615385267469618, 0.14795918367346939, 0.035897435897435895]
+
+Element 32 (UI):
+  Caption: a dropdown menu.
+  Coordinates (xywh): [0.5224489795918368, 0.03931624257666433, 0.35612244897959183, 0.025641028901450653]
+

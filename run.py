@@ -1,3 +1,4 @@
+import base64
 import platform
 import argparse
 import time
@@ -176,27 +177,43 @@ def exec_action_click(info, web_ele, driver_task):
 
 def exec_action_click_by_coordinates(info, web_ele, driver_task):
     # Add support for clicking by coordinates
-    if isinstance(web_ele, dict) and 'bounds' in web_ele:  # New coordinate-based click
-        bounds = web_ele['bounds']
-        center_x = bounds[0] + bounds[2] // 2
-        center_y = bounds[1] + bounds[3] // 2
+    if isinstance(web_ele, dict) and 'bbox' in web_ele:  # New coordinate-based click
+        logging.info(f"Attempting to click on element with bbox: {web_ele}")
+        bounds = web_ele['bbox']
+        center_x = bounds[0] + (bounds[2] - bounds[0]) // 2
+        center_y = bounds[1] + (bounds[3] - bounds[1]) // 2
         element = driver_task.execute_script(
             "return document.elementFromPoint(arguments[0], arguments[1]);", 
             center_x, center_y
         )
         if element:
-            driver_task.execute_script("arguments[0].setAttribute('target', '_self')", element)
-            element.click()
+            driver_task.execute_script("arguments[0].setAttribute('target', '_self');", element)
+            logging.info(f"Element found at coordinates: {center_x}, {center_y}, attempting click.")
+            try:
+                element.click()
+                logging.info(f"Successfully clicked on element: {element}")
+            except Exception as e:
+                logging.error(f"Error clicking on element: {e}")
         else:
             # Fallback to JavaScript click at coordinates if no element found
-            driver_task.execute_script(
-                'document.elementFromPoint(arguments[0], arguments[1]).click();',
-                center_x, center_y
-            )
+            logging.warning(f"No element found at coordinates: {center_x}, {center_y}. Attempting JavaScript click.")
+            try:
+                driver_task.execute_script(
+                    'document.elementFromPoint(arguments[0], arguments[1]).click();',
+                    center_x, center_y
+                )
+                logging.info(f"JavaScript click executed at coordinates: {center_x}, {center_y}")
+            except Exception as e:
+                logging.error(f"Error executing JavaScript click: {e}")
     else:  # Original element-based click
-        driver_task.execute_script("arguments[0].setAttribute('target', '_self')", web_ele)
-        web_ele.click()
-    time.sleep(3)
+        logging.info("Attempting original element-based click.")
+        try:
+            driver_task.execute_script("arguments[0].setAttribute('target', '_self');", web_ele)
+            web_ele.click()
+            logging.info("Successfully clicked on web element.")
+        except Exception as e:
+            logging.error(f"Error clicking on web element: {e}")
+    time.sleep(1)
 
 
 def exec_action_type(info, web_ele, driver_task):
@@ -238,6 +255,66 @@ def exec_action_type(info, web_ele, driver_task):
     time.sleep(10)
     return warn_obs
 
+def exec_action_type_by_coordinates(info, web_ele, driver_task):
+    warn_obs = ""
+    type_content = info['content']
+    element = None
+    # Handle both element and coordinate-based inputs
+    if isinstance(web_ele, dict) and 'bbox' in web_ele:  # Coordinate-based typing
+        logging.info(f"Attempting to type in element with bbox: {web_ele}")
+        bounds = web_ele['bbox']
+        center_x = bounds[0] + (bounds[2] - bounds[0]) // 2
+        center_y = bounds[1] + (bounds[3] - bounds[1]) // 2
+        element = driver_task.execute_script(
+            "return document.elementFromPoint(arguments[0], arguments[1]);",
+            center_x, center_y
+        )
+        if element:
+            web_ele = element
+        else:
+            logging.error(f"No element found at coordinates: {center_x}, {center_y}")
+            return "Error: Could not find element at specified coordinates"
+
+    # Continue with normal typing operation
+    ele_tag_name = web_ele.tag_name.lower()
+    ele_type = web_ele.get_attribute("type")
+    if (ele_tag_name != 'input' and ele_tag_name != 'textarea') or (
+            ele_tag_name == 'input' and ele_type not in ['text', 'search', 'password', 'email', 'tel']):
+        warn_obs = f"note: The web element you're trying to type may not be a textbox, and its tag name is <{web_ele.tag_name}>, type is {ele_type}."
+
+    try:
+        element.clear()
+        if platform.system() == 'Darwin':
+            element.send_keys(Keys.COMMAND + "a")
+        else:
+            element.send_keys(Keys.CONTROL + "a")
+        element.send_keys(" ")
+        element.send_keys(Keys.BACKSPACE)
+    except Exception as e:
+        logging.warning(f"Clear field operation failed: {e}")
+
+    actions = ActionChains(driver_task)
+    actions.click(element).perform()
+    actions.pause(1)
+
+    try:
+        driver_task.execute_script(
+            """window.onkeydown = function(e) {
+                if(e.keyCode == 32 && e.target.type != 'text' && 
+                   e.target.type != 'textarea' && e.target.type != 'search') {
+                    e.preventDefault();
+                }
+            };"""
+        )
+    except Exception as e:
+        logging.warning(f"Failed to set keydown handler: {e}")
+
+    actions.send_keys(type_content)
+    actions.pause(2)
+    actions.send_keys(Keys.ENTER)
+    actions.perform()
+    time.sleep(10)
+    return warn_obs
 
 def exec_action_scroll(info, web_eles, driver_task, args, obs_info):
     scroll_ele_number = info['number']
@@ -339,13 +416,19 @@ def main(args):
                     if not args.text_only:
                         img_path = os.path.join(task_dir, 'screenshot_raw{}.png'.format(it))
                         driver_task.save_screenshot(img_path)
-                        rects, web_eles, web_eles_text = get_element_rect_from_image(driver_task, img_path, fix_color=args.fix_box_color)#get_web_element_rect(driver_task, fix_color=args.fix_box_color)
+                        base64_annotated_image, rects, web_eles, web_eles_text =  get_element_rect_from_image(
+                            img_path,
+                            fix_color=True
+                        )
                         logging.info(f"Num of interactive elements: {len(rects)}")
                         logging.info(f"Web elements text: {web_eles_text}")
+                        annotated_image_path = os.path.join(task_dir, 'annotated_screenshot{}.png'.format(it))
+                        with open(annotated_image_path, "wb") as f:
+                            f.write(base64.b64decode(base64_annotated_image))
+                        print(f"Saved annotated image to: {annotated_image_path}")
                     else:
                         accessibility_tree_path = os.path.join(task_dir, 'accessibility_tree{}'.format(it))
                         ac_tree, obs_info = get_webarena_accessibility_tree(driver_task, accessibility_tree_path)
-
                 except Exception as e:
                     if not args.text_only:
                         logging.error('Driver error when adding set-of-mark.')
@@ -353,9 +436,6 @@ def main(args):
                         logging.error('Driver error when obtaining accessibility tree.')
                     logging.error(e)
                     break
-
-                img_path = os.path.join(task_dir, 'screenshot{}.png'.format(it))
-                driver_task.save_screenshot(img_path)
 
                 # accessibility tree
                 if (not args.text_only) and args.save_accessibility_tree:
@@ -399,8 +479,6 @@ def main(args):
                 logging.info('API call complete...')
             gpt_4v_res = openai_response.choices[0].message.content
             messages.append({'role': 'assistant', 'content': gpt_4v_res})
-
-
             # remove the rects on the website
             if (not args.text_only) and rects:
                 logging.info(f"Num of interactive elements: {len(rects)}")
@@ -440,12 +518,9 @@ def main(args):
                         element_box_center = (element_box[0] + element_box[2] // 2,
                                               element_box[1] + element_box[3] // 2)
                         web_ele = driver_task.execute_script("return document.elementFromPoint(arguments[0], arguments[1]);", element_box_center[0], element_box_center[1])
-
-                    ele_tag_name = web_ele.tag_name.lower()
-                    ele_type = web_ele.get_attribute("type")
-
-                    exec_action_click(info, web_ele, driver_task)
-
+                    logging.info(f"Click element: {web_ele}")
+                    exec_action_click_by_coordinates(info, web_ele, driver_task)
+                    logging.info(f"Clicked element: {web_ele}")
                     # deal with PDF file
                     current_files = sorted(os.listdir(args.download_dir))
                     if current_files != download_files:
@@ -461,8 +536,7 @@ def main(args):
                             pdf_obs = "You downloaded a PDF file, I ask the Assistant API to answer the task based on the PDF file and get the following response: " + pdf_obs
                         download_files = current_files
 
-                    if ele_tag_name == 'button' and ele_type == 'submit':
-                        time.sleep(10)
+                    #time.sleep(1)
 
                 elif action_key == 'wait':
                     time.sleep(5)
@@ -478,7 +552,7 @@ def main(args):
                                               element_box[1] + element_box[3] // 2)
                         web_ele = driver_task.execute_script("return document.elementFromPoint(arguments[0], arguments[1]);", element_box_center[0], element_box_center[1])
 
-                    warn_obs = exec_action_type(info, web_ele, driver_task)
+                    warn_obs = exec_action_type_by_coordinates(info, web_ele, driver_task)
                     if 'wolfram' in task['web']:
                         time.sleep(5)
 

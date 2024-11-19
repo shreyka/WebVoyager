@@ -11,7 +11,6 @@ from PIL import Image
 from utils_webarena import fetch_browser_info, fetch_page_accessibility_tree,\
                     parse_accessibility_tree, clean_accesibility_tree
 
-
 def resize_image(image_path):
     image = Image.open(image_path)
     width, height = image.size
@@ -28,7 +27,6 @@ def resize_image(image_path):
     resized_image = image.resize((new_width, new_height), Image.LANCZOS)
     resized_image.save(image_path)
     # return resized_image
-
 
 # base64 encoding
 # Code from OpenAI Document
@@ -55,9 +53,6 @@ def simplex_encode_image(image_path):
     _, buffer = cv2.imencode(".jpg", frame, encode_params)
 
     return base64.b64encode(buffer).decode("utf-8")
-
-
-
 
 # interact with webpage and add rectangles on elements
 def get_web_element_rect(browser, fix_color=True):
@@ -356,7 +351,6 @@ def print_message(json_object, save_dir=None):
         with open(os.path.join(save_dir, 'interact_messages.json'), 'w', encoding='utf-8') as fw:
             json.dump(remove_b64code_obj, fw, indent=2)
     # return remove_b64code_obj
-
 
 def get_webarena_accessibility_tree(browser, save_file=None):
     browser_info = fetch_browser_info(browser)

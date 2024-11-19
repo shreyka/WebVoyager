@@ -5,6 +5,5 @@ test_code.py
 .env
 __pycache__
 OmniParser/
-omniparser_test_results/
+omniparser_captions_test/
 test_results/
-
